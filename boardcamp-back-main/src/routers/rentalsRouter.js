@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  delRentals,
   endRental,
   getRentals,
   postRent,
@@ -12,5 +13,6 @@ const rentalsRouter = Router();
 rentalsRouter.post("/rentals", validateSchema(rentalSchema), postRent);
 rentalsRouter.get("/rentals", getRentals);
 rentalsRouter.post("/rentals/:id/return", endRental);
+rentalsRouter.delete("/rentals/:id", delRentals);
 
 export default rentalsRouter;

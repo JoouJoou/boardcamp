@@ -98,12 +98,35 @@ export async function endRental(req, res) {
     const diffDay = dayjs().diff(rent[0].rentDate, "day");
     console.log(date);
     const delayFee = game[0].pricePerDay * diffDay;
+    const gameAmount = game[0].stockTotal + 1;
+
+    await connection.query(
+      `UPDATE games SET "stockTotal" = ${gameAmount} WHERE id = ${rent[0].gameId}`
+    );
     await connection.query(
       `UPDATE rentals SET "returnDate" = '${date}', "delayFee" = ${delayFee} WHERE id = ${id}`
     );
     return res.sendStatus(200);
   } catch (err) {
     console.log(err);
+    return res.sendStatus(500);
+  }
+}
+
+export async function delRentals(req, res) {
+  try {
+    const { id } = req.params;
+    const { rows: rent } = await connection.query(
+      `SELECT * FROM rentals WHERE id = ${id}`
+    );
+    if (rent.length === 0) {
+      return res.sendStatus(404);
+    } else if (rent[0].delayFee === null) {
+      return res.sendStatus(400);
+    }
+    await connection.query(`DELETE FROM rentals WHERE id = ${id}`);
+    return res.sendStatus(200);
+  } catch {
     return res.sendStatus(500);
   }
 }
