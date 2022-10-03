@@ -2,6 +2,13 @@ import { connection } from "../database/db.js";
 
 export async function getGames(req, res) {
   try {
+    const name = req.query.name;
+    if (name) {
+      const { rows: game } = await connection.query(
+        `SELECT * FROM games WHERE name LIKE '${name}%'`
+      );
+      return res.send(game);
+    }
     const { rows: games } = await connection.query("SELECT * FROM games;");
     return res.send(games);
   } catch {

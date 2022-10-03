@@ -23,7 +23,7 @@ export async function getCustomers(req, res) {
     const cpf = req.query.cpf;
     if (cpf) {
       const { rows: customer } = await connection.query(
-        `SELECT * FROM customers WHERE cpf = '${cpf}'`
+        `SELECT * FROM customers WHERE cpf LIKE '${cpf}%'`
       );
       return res.send(customer);
     }
@@ -48,6 +48,32 @@ export async function getCustomer(req, res) {
     }
     return res.send(customer);
   } catch {
+    return res.sendStatus(500);
+  }
+}
+
+export async function putCustomer(req, res) {
+  try {
+    const { id } = req.params;
+    const { rows: customer } = await connection.query(
+      `SELECT * FROM customers WHERE cpf = '${req.body.cpf}'`
+    );
+    if (customer.length > 0) {
+      if (customer.length > 2 || customer[0].id !== Number(id)) {
+        return res.sendStatus(409);
+      }
+    }
+
+    await connection.query(
+      `UPDATE customers SET name = '${req.body.name}', phone = '${
+        req.body.phone
+      }', cpf = '${req.body.cpf}', birthday = '${
+        req.body.birthday
+      }' WHERE id = ${Number(id)}`
+    );
+    return res.sendStatus(200);
+  } catch (err) {
+    console.log(err);
     return res.sendStatus(500);
   }
 }
