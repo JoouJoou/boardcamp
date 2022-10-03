@@ -1,17 +1,18 @@
-import { MongoClient } from "mongodb";
 import dotenv from "dotenv";
+import pkg from "pg";
 
 dotenv.config();
 
-const mongoClient = new MongoClient(process.env.MONGO_URI);
-let db;
-mongoClient
-  .connect()
-  .then(() => {
-    db = mongoClient.db("plainstore");
-  })
-  .catch((e) => {
-    console.log(e);
-  });
+const { Pool } = pkg;
 
-export { db };
+const user = "postgres";
+const password = "1234";
+const host = "localhost";
+const port = 5432;
+const database = "boardcamp";
+
+const connection = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
+
+export { connection };
